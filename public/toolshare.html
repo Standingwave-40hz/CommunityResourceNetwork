@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tool Share | Community Resource Network</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Community Tool Share</h1>
+<header>
+
+    <nav>
+    <p id="loginMessage"></p>
+    <a href="index.html">Main Listings</a> |
+    <a href="toolshare.html">Tool Share</a> |
+    <a href="mylistings.html">My Listings</a> |
+    <span id="authLinks"></span>
+  </nav>
+</header>
+   <p id="loginMessage"></p>
+
+<form id="toolForm">
+  <input type="text" id="title" placeholder="Tool Name" required />
+  <input type="text" id="description" placeholder="Description" required />
+  <input type="text" id="contact" placeholder="Contact Info" required />
+  <button type="submit">Post Tool</button>
+</form>
+
+    <h2>Available Tools</h2>
+    <input type="text" id="search" placeholder="Search tools..." />
+    <div id="toolListings"></div>
+
+    <script src="toolscript.js"></script>
+</body>
+</html>

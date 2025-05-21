@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Community Resource Network</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Community Resource Network</h1>
+     <header>
+        <nav>
+    <a href="index.html">Main Listings</a> |
+    <a href="toolshare.html">Tool Share</a> |
+    <a href="mylistings.html">My Listings</a> |
+    <span id="authLinks"></span>
+  </nav>
+</header>
+    <form id="listingForm">
+        <input type="text" id="title" placeholder="Item Title" required />
+        <input type="text" id="description" placeholder="Description" required />
+        <select id="category" required>
+            <option value="">Select Category</option>
+            <option value="Produce">Produce</option>
+            <option value="Meat/Eggs">Meat/Eggs</option>
+            <option value="Crafts">Crafts</option>
+            <option value="Prepared Foods">Prepared Foods</option>
+            <option value="Dried Goods">Dried Goods</option>
+        </select>
+        <input type="text" id="contact" placeholder="Contact Info" required />
+        <button type="submit">Post Listing</button>
+    </form>
+
+    <h2>Available Listings</h2>
+    <input type="text" id="searchMain" placeholder="Search listings..." />
+    <div id="mainListings"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

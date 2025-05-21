@@ -1,0 +1,62 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+    width: 300px;
+}
+
+button {
+    padding: 10px 15px;
+}
+
+#listings {
+    background: white;
+    padding: 15px;
+    border: 1px solid #ccc;
+}
+.tool-card button {
+  margin-top: 5px;
+  background-color: #c62828;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.tool-card button:hover {
+  background-color: #b71c1c;
+}
+header {
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+#loginMessage {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #444;
+}
