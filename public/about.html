@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>About - CommShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
 </head>
 <body>
-  
-  <!-- Header will be injected by shared.js -->
+  <!-- Shared header and nav bar injected by shared.js -->
 
+  <!-- Main content area -->
   <main style="max-width: 800px; margin: 2em auto; padding: 1em; background: #fff; border-radius: 8px;">
     <h2>About CommShare</h2>
-    <p><strong>CommShare</strong> is a community resource sharing platform designed to support local exchange of tools, food, crafts, and services. Whether you're a gardener with extra produce, a craftsperson with surplus materials, or a neighbor in need of a tool for the weekend, CommShare helps bring people together to share what they have.</p>
+    <p>
+      <strong>CommShare</strong> is a community resource sharing platform designed to support local exchange of tools,
+      food, crafts, and services. Whether you're a gardener with extra produce, a craftsperson with surplus materials,
+      or a neighbor in need of a tool for the weekend, CommShare helps bring people together to share what they have.
+    </p>
 
     <p>The platform allows users to:</p>
     <ul>
@@ -23,9 +27,36 @@
     </ul>
 
     <h2>About the Creator</h2>
-    <p>Hi! I'm Caley Kelly, the developer behind CommShare. I'm currently studying Computer Programming at Algonquin College. My goal is to build tools that empower local communities to share resources, reduce waste, and build resilience. I have a background in trades, music, and sustainable living — and I'm passionate about using technology for good.</p>
+    <p>
+      Hi! I'm Caley Kelly, the developer behind CommShare. I'm currently studying Computer Programming at Algonquin
+      College. My goal is to build tools that empower local communities to share resources, reduce waste, and build
+      resilience. I have a background in trades, music, and sustainable living — and I'm passionate about using
+      technology for good.
+    </p>
 
-    <p>If you'd like to contribute ideas, help test features, or collaborate, feel free to reach out via the contact info in your profile settings!</p>
+    <p>If you'd like to contribute ideas, help test features, or collaborate, please contact the admin below:</p>
+
+    <!-- This will be populated dynamically from the actual admin user record -->
+    <div id="adminContact" style="margin-top: 1.5em; background: #e9f6ff; padding: 10px; border-left: 4px solid #2196f3;">
+      <strong>Admin Contact:</strong> <span id="adminEmail">Loading...</span>
+    </div>
   </main>
+
+  <!-- Script to dynamically fetch admin contact info from backend -->
+  <script>
+    fetch('/api/auth/admin-contact')
+      .then(res => res.json())
+      .then(data => {
+        if (data.contact) {
+          const email = data.contact;
+          document.getElementById('adminEmail').innerHTML = `<a href="mailto:${email}">${email}</a>`;
+        } else {
+          document.getElementById('adminEmail').innerText = 'unavailable';
+        }
+      })
+      .catch(() => {
+        document.getElementById('adminEmail').innerText = 'unavailable';
+      });
+  </script>
 </body>
 </html>

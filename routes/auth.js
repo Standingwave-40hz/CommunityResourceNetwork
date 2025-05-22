@@ -157,5 +157,17 @@ router.patch('/password', authenticateUser, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+router.get('/admin-contact', async (req, res) => {
+  try {
+    const admin = await User.findOne({ isAdmin: true }).sort({ createdAt: 1 }); // oldest admin
+    if (!admin || !admin.contact) {
+      return res.status(404).json({ message: 'Admin contact not available' });
+    }
+    res.json({ contact: admin.contact });
+  } catch (err) {
+    console.error("Error fetching admin contact:", err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;

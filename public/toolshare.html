@@ -1,35 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CommShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>CommShare – Tool Share</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="toolscript.js" defer></script>
 </head>
 <body>
+  <!-- Shared header injected by shared.js -->
 
-  <h1>Tool Share</h1>
+  <main>
+    <h1>Tool Share</h1>
 
-  <form id="toolForm">
-    <input type="text" id="title" placeholder="Tool Title" required />
-    <input type="text" id="description" placeholder="Description" required />
-    <input type="text" id="contact" placeholder="Contact Info" required />
-    <button type="submit">Add Tool</button>
-  </form>
+    <!-- Tool listing form (visible to logged-in users only) -->
+    <form id="toolForm">
+      <input type="text" id="title" placeholder="Tool Title" required />
+      <input type="text" id="description" placeholder="Description" required />
+      <input type="text" id="contact" placeholder="Contact Info" required />
+      <button type="submit">Add Tool</button>
+    </form>
 
-  <h2>Available Tools</h2>
-  <label for="categoryFilter"><strong>Filter by Category:</strong></label>
-  <select id="categoryFilter">
-    <option value="">All Categories</option>
-    <!-- categories will be injected here -->
-  </select>
+    <!-- Tool filter and search -->
+    <h2>Available Tools</h2>
+    <label for="categoryFilter"><strong>Filter by Category:</strong></label>
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <!-- categories will be injected here -->
+    </select>
 
-  <input type="text" id="searchMain" placeholder="Search tools..." />
-  <div id="toolListings"></div>
-  <script src="shared.js"></script>
+    <input type="text" id="searchMain" placeholder="Search tools..." />
 
-  <script src="toolscript.js"></script>
-  <script src="script.js"></script>
+    <!-- Tool listing results -->
+    <div id="toolListings"></div>
+  </main>
 </body>
 </html>

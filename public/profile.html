@@ -1,95 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ComShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>CommShare – My Profile</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
-  <script src="script.js" defer></script>
 </head>
 <body>
+  <!-- Shared header injected by shared.js -->
 
-  <h1>My Profile</h1>
+  <main>
+    <h1>My Profile</h1>
 
-  <div id="profileContent">
-    <div class="profile-section">
-      <h2>Contact Information</h2>
-      <form id="contactForm">
-        <label for="contact">Preferred Contact Info:</label>
-        <input type="text" id="contact" name="contact" required />
-        <button type="submit">Save Contact Info</button>
-      </form>
+    <div id="profileContent">
+      <!-- Contact Info -->
+      <div class="profile-section">
+        <h2>Contact Information</h2>
+        <form id="contactForm">
+          <label for="contact">Preferred Contact Info:</label>
+          <input type="text" id="contact" name="contact" required />
+          <button type="submit">Save Contact Info</button>
+        </form>
+      </div>
+
+      <!-- Password Update -->
+      <div class="profile-section">
+        <h2>Update Password</h2>
+        <form id="passwordForm">
+          <label for="currentPassword">Current Password:</label>
+          <input type="password" id="currentPassword" required />
+
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" required />
+
+          <button type="submit">Update Password</button>
+        </form>
+      </div>
+
+      <!-- Borrow/Trade History Section (optional; enable if needed)
+      <div class="profile-section">
+        <h2>Borrow & Trade History</h2>
+        <div id="historyList">Loading history...</div>
+      </div>
+      -->
     </div>
-
-    <div class="profile-section">
-      <h2>Update Password</h2>
-      <form id="passwordForm">
-        <label for="currentPassword">Current Password:</label>
-        <input type="password" id="currentPassword" required />
-
-        <label for="newPassword">New Password:</label>
-        <input type="password" id="newPassword" required />
-
-        <button type="submit">Update Password</button>
-      </form>
-    </div>
-
-    
-  </div>
-  <script src="shared.js"></script>
+  </main>
 
   <script>
-    const authLinks = document.getElementById('authLinks');
-    const isLoggedIn = document.cookie.includes('token=');
-    if (authLinks) {
-      authLinks.innerHTML = isLoggedIn ? `<a href="#" onclick="logout()">Logout</a>` : `<a href="login.html">Login</a>`;
-    }
-
-    function logout() {
-      document.cookie = "token=; Max-Age=0; path=/";
-      location.reload();
-    }
-
     async function loadProfile() {
-      let user = null;
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) throw new Error('Not authenticated');
-        user = await res.json();
 
+        const user = await res.json();
         document.getElementById("welcomeBanner").innerText = `Welcome, ${user.username}`;
         document.getElementById("contact").value = user.contact || '';
 
         if (user.isAdmin) {
           const adminLink = document.getElementById("adminLink");
-          adminLink.innerHTML = `<a href="admin.html">Admin Panel</a> | `;
+          if (adminLink) {
+            adminLink.innerHTML = `<a href="admin.html">Admin Panel</a> | `;
+          }
         }
 
-        const historyRes = await fetch('/api/borrow/history/user');
-/*const history = await historyRes.json();
-console.log("History response:", history);
-if (!Array.isArray(history)) {
-  console.error("Invalid history response:", history);
-  document.getElementById("historyList").innerText = "Unable to load your borrow history. Please try again later.";
-  return;
-}
-
-        if (history.length === 0) {
-          historyList.innerText = "No history available.";
-          return;
-        }
-
-        history.forEach(record => {
-          const card = document.createElement('div');
-          card.className = 'history-card';
-          card.innerHTML = `
-            <strong>${record.title}</strong> (${record.category})<br>
-            Borrowed: ${new Date(record.borrowedAt).toLocaleDateString()}<br>
-            Returned: ${record.returnedAt ? new Date(record.returnedAt).toLocaleDateString() : 'Not yet'}<br>
-            Comment: ${record.comment || '<em>None</em>'}
-          `;
-          historyList.appendChild(card);
-        });*/
+        // Optionally load borrow/trade history
+        // const historyRes = await fetch('/api/borrow/history/user');
+        // const history = await historyRes.json();
+        // ... render logic here
 
       } catch (err) {
         console.error("Failed to load profile:", err);

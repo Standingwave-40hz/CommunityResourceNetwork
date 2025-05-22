@@ -1,62 +1,200 @@
+/* Base Page Styling */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-form {
-    margin-bottom: 20px;
+/* Page Title */
+#appTitle h1 {
+  margin: 0;
+  padding: 20px 0 10px;
+  text-align: center;
+  font-size: 2.2rem;
+  color: #2c3e50;
 }
 
-input {
-    display: block;
-    margin: 10px 0;
-    padding: 8px;
-    width: 300px;
-}
-
-button {
-    padding: 10px 15px;
-}
-
-#listings {
-    background: white;
-    padding: 15px;
-    border: 1px solid #ccc;
-}
-.tool-card button {
-  margin-top: 5px;
-  background-color: #c62828;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 3px;
-}
-
-.tool-card button:hover {
-  background-color: #b71c1c;
-}
+/* Header and Navigation */
 header {
-    margin-bottom: 20px;
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 5px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+  text-align: center;
 }
 
 nav a {
-    margin: 0 10px;
-    text-decoration: none;
-    font-weight: bold;
-    color: #333;
+  margin: 0 12px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
 nav a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+}
+
+#welcomeBanner {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #444;
 }
 
 #loginMessage {
   margin-bottom: 10px;
   font-size: 1rem;
   color: #444;
+}
+
+/* Main Layout Wrapper */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* Forms */
+form {
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+input, select, textarea {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  width: 100%;
+  max-width: 460px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Buttons */
+button {
+  padding: 10px 16px;
+  background-color: #2b7a78;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 0.95rem;
+}
+
+button:hover {
+  background-color: #205e5b;
+}
+
+/* Tool Cards */
+.tool-card {
+  background: #fff;
+  padding: 18px;
+  margin: 20px 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 700px;
+  transition: box-shadow 0.2s ease;
+}
+
+.tool-card:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.tool-card button {
+  margin-top: 8px;
+  background-color: #c62828;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tool-card button:hover {
+  background-color: #b71c1c;
+}
+
+/* Listings container */
+#mainListings,
+#toolListings,
+#myListings {
+  padding: 0 10px;
+}
+
+/* Empty message styling */
+.empty-message {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-top: 20px;
+}
+
+/* Admin Panel Specific */
+.admin-section {
+  margin: 30px 0;
+}
+
+.admin-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
+}
+
+.admin-card button {
+  margin: 6px 6px 0 0;
+  background-color: #2b7a78;
+  padding: 8px 12px;
+}
+
+.admin-card button:hover {
+  background-color: #205e5b;
+}
+
+/* Fix misaligned checkbox row in admin create user form */
+#newIsAdmin {
+  margin-right: 6px;
+  transform: translateY(2px);
+}
+
+label[for="newIsAdmin"], label > input#newIsAdmin {
+  display: inline-block;
+  width: auto;
+  margin-top: 10px;
+}
+
+/* Responsive layout tweak */
+@media (max-width: 600px) {
+  input, select, button {
+    width: 100%;
+  }
+
+  .tool-card {
+    margin: 10px 5px;
+    padding: 12px;
+  }
+
+  nav a {
+    display: block;
+    margin: 6px 0;
+  }
+
+  main {
+    padding: 20px 10px;
+  }
+}
+
+/* Utility */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }

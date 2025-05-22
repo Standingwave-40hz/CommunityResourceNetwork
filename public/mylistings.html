@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ComShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>CommShare – My Listings</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
-  <script src="script.js" defer></script>
+  <script src="mylistings.js" defer></script>
 </head>
 <body>
+  <!-- Header injected by shared.js -->
 
-  <h1>My Listings</h1>
-  <input type="text" id="searchMyListings" placeholder="Search your listings..." />
-  <div id="myListings"></div>
+  <main>
+    <h1>My Listings</h1>
 
-  <script src="mylistings.js"></script>
-  <script src="script.js"></script>
+    <!-- Search bar for filtering user's listings -->
+    <input type="text" id="searchMyListings" placeholder="Search your listings..." />
+
+    <!-- Container for user's listings -->
+    <div id="myListings"></div>
+  </main>
 </body>
 </html>

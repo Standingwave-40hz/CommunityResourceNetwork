@@ -1,38 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ComShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>CommShare</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
-  
-  <!-- Shared header injected by shared.js -->
+  <!-- Header will be injected by shared.js -->
 
-  <form id="listingForm">
-    <input type="text" id="title" placeholder="Item Title" required />
-    <input type="text" id="description" placeholder="Description" required />
-    <select id="category" required>
-      <option value="">Select Category</option>
-      <!-- categories will be injected here -->
+  <main>
+    <!-- Listing Submission Form (visible only when logged in) -->
+    <form id="listingForm">
+      <input type="text" id="title" placeholder="Item Title" required />
+      <input type="text" id="description" placeholder="Description" required />
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <!-- Options will be injected via categories.js -->
+      </select>
+      <input type="text" id="contact" placeholder="Contact Info" required />
+      <button type="submit">Post Listing</button>
+    </form>
+
+    <!-- Listing Filters -->
+    <h2>Available Listings</h2>
+    <label for="categoryFilter"><strong>Filter by Category:</strong></label>
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <!-- Options will be injected via categories.js -->
     </select>
-    <input type="text" id="contact" placeholder="Contact Info" required />
-    <button type="submit">Post Listing</button>
-  </form>
 
-  <h2>Available Listings</h2>
-  <label for="categoryFilter"><strong>Filter by Category:</strong></label>
-  <select id="categoryFilter">
-    <option value="">All Categories</option>
-    <!-- categories will be injected here -->
-  </select>
+    <input type="text" id="searchMain" placeholder="Search listings..." />
 
-  <input type="text" id="searchMain" placeholder="Search listings..." />
-  <div id="mainListings"></div>
+    <!-- Listing Results -->
+    <div id="mainListings"></div>
+  </main>
 
-  <!-- Load categories from module -->
+  <!-- Load categories dynamically -->
   <script type="module">
     import { CATEGORIES } from './categories.js';
 

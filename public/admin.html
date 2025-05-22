@@ -1,43 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ComShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>ComShare – Admin Panel</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
-  <script src="script.js" defer></script>
 </head>
 <body>
+  <main>
+    <h1>Admin Panel</h1>
+    <div id="adminBanner" style="display: none;">👑 You are logged in as admin.</div>
 
-  <h1>Admin Panel</h1>
-  <div id="adminBanner" style="display: none;">👑 You are logged in as admin.</div>
+    <div class="admin-section">
+      <h2>All Users</h2>
+      <div id="userList"></div>
+      <button onclick="exportUsers()">📤 Export Users as CSV</button>
+    </div>
 
-  <div class="admin-section">
-    <h2>All Users</h2>
-    <div id="userList"></div>
-    <button onclick="exportUsers()">📤 Export Users as CSV</button>
-  </div>
+    <div class="admin-section">
+      <h2>All Listings</h2>
+      <input type="text" id="searchListings" placeholder="Search listings by title or category..." style="width: 100%; max-width: 500px;" />
+      <div id="listingList"></div>
+      <button onclick="exportListings()">📤 Export Listings as CSV</button>
+    </div>
 
-  <div class="admin-section">
-    <h2>All Listings</h2>
-    <input type="text" id="searchListings" placeholder="Search listings by title or category..." />
-    <div id="listingList"></div>
-    <button onclick="exportListings()">📤 Export Listings as CSV</button>
-  </div>
-  <script src="shared.js"></script>
+    <div class="admin-section">
+      <h2>Create New User</h2>
+      <form id="createUserForm">
+        <input type="text" id="newUsername" placeholder="Username" required />
+        <input type="password" id="newPassword" placeholder="Password" required />
+        <input type="text" id="newContact" placeholder="Contact Info (email or phone)" />
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+          <label style="display: flex; align-items: center;">
+            <input type="checkbox" id="newIsAdmin" style="margin-right: 6px;" />
+            Make admin?
+          </label>
+          <button type="submit">Create User</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="admin-section" style="margin-top: 2em; background: #e9f6ff; padding: 10px; border-left: 4px solid #2196f3;">
+      <strong>Admin Contact:</strong> <span id="adminEmail">Loading...</span>
+    </div>
+  </main>
 
   <script>
-    const authLinks = document.getElementById('authLinks');
-    const isLoggedIn = document.cookie.includes('token=');
-    if (authLinks) {
-      authLinks.innerHTML = isLoggedIn ? `<a href="#" onclick="logout()">Logout</a>` : `<a href="login.html">Login</a>`;
-    }
-
-    function logout() {
-      document.cookie = "token=; Max-Age=0; path=/";
-      location.reload();
-    }
-
     async function checkAdminAccess() {
       try {
         const res = await fetch('/api/auth/me');
@@ -58,28 +66,15 @@
     let listingsData = [];
 
     async function fetchAdminData() {
-      let users = [];
-      let listings = [];
-
-      try {
-        const [usersRes, listingsRes] = await Promise.all([
-          fetch('/api/admin/users'),
-          fetch('/api/admin/listings')
-        ]);
-
-        users = await usersRes.json();
-        listings = await listingsRes.json();
-
-        if (!Array.isArray(users)) throw new Error("Users response is not an array");
-        if (!Array.isArray(listings)) throw new Error("Listings response is not an array");
-
-        listingsData = listings;
-        renderUsers(users);
-        renderListings(listings);
-      } catch (err) {
-        console.error("Admin panel load error:", err);
-        alert("Failed to load admin data. Check browser console for details.");
-      }
+      const [usersRes, listingsRes] = await Promise.all([
+        fetch('/api/admin/users'),
+        fetch('/api/admin/listings')
+      ]);
+      const users = await usersRes.json();
+      const listings = await listingsRes.json();
+      listingsData = listings;
+      renderUsers(users);
+      renderListings(listings);
     }
 
     function renderUsers(users) {
@@ -94,7 +89,9 @@
           ${user.isDisabled ? '<span style="color:red"> (disabled)</span>' : ''}<br>
           <button onclick="deleteUser('${user._id}')">Delete</button>
           <button onclick="promoteUser('${user._id}')">Promote to Admin</button>
-          <button onclick="disableUser('${user._id}')">Disable User</button>
+          <button onclick="toggleUserDisable('${user._id}', ${user.isDisabled})">
+            ${user.isDisabled ? 'Enable User' : 'Disable User'}
+          </button>
         `;
         container.appendChild(div);
       });
@@ -118,8 +115,7 @@
     document.getElementById('searchListings').addEventListener('input', () => {
       const term = document.getElementById('searchListings').value.toLowerCase();
       const filtered = listingsData.filter(l =>
-        l.title.toLowerCase().includes(term) ||
-        l.category.toLowerCase().includes(term)
+        l.title.toLowerCase().includes(term) || l.category.toLowerCase().includes(term)
       );
       renderListings(filtered);
     });
@@ -137,10 +133,11 @@
       else alert('Failed to promote user');
     }
 
-    async function disableUser(id) {
-      const res = await fetch(`/api/admin/users/${id}/disable`, { method: 'PATCH' });
+    async function toggleUserDisable(id, isDisabled) {
+      const route = isDisabled ? 'enable' : 'disable';
+      const res = await fetch(`/api/admin/users/${id}/${route}`, { method: 'PATCH' });
       if (res.ok) fetchAdminData();
-      else alert('Failed to disable user');
+      else alert(`Failed to ${route} user`);
     }
 
     async function deleteListing(id) {
@@ -157,6 +154,38 @@
     async function exportListings() {
       window.open('/api/admin/export/listings', '_blank');
     }
+
+    document.getElementById('createUserForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newUser = {
+        username: document.getElementById('newUsername').value,
+        password: document.getElementById('newPassword').value,
+        contact: document.getElementById('newContact').value,
+        isAdmin: document.getElementById('newIsAdmin').checked
+      };
+      const res = await fetch('/api/admin/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser)
+      });
+      const data = await res.json();
+      alert(data.message);
+      if (res.ok) {
+        document.getElementById('createUserForm').reset();
+        fetchAdminData();
+      }
+    });
+
+    fetch('/api/auth/admin-contact')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('adminEmail').innerHTML = data.contact
+          ? `<a href="mailto:${data.contact}">${data.contact}</a>`
+          : 'unavailable';
+      })
+      .catch(() => {
+        document.getElementById('adminEmail').innerText = 'unavailable';
+      });
 
     checkAdminAccess();
   </script>

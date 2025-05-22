@@ -1,36 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ComShare</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>CommShare – Login</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="shared.js" defer></script>
-  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Login</h1>
+  <!-- Header injected by shared.js -->
 
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
+  <main>
+    <h1>Login</h1>
 
-  <p id="message"></p>
-  <a href="register.html">Don't have an account? Register here</a>
+    <!-- Login Form -->
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
 
-  <!-- Terms of Service Modal -->
-  <div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00000099; z-index:1000;">
-    <div style="background:#fff; padding:20px; max-width:600px; margin:10% auto; border-radius:5px;">
-      <h2>Terms of Service & Privacy Policy</h2>
-      <div style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:15px; font-size:0.9em;">
-        <p><strong>Terms of Service:</strong> Use this community exchange at your own risk. Be respectful. Do not list illegal items.</p>
-        <p><strong>Privacy Policy:</strong> Your username is visible to other users. We do not collect personal data beyond what's needed for basic login functionality.</p>
+    <p id="message"></p>
+    <a href="register.html">Don't have an account? Register here</a>
+
+    <!-- Terms of Service Modal -->
+    <div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00000099; z-index:1000;">
+      <div style="background:#fff; padding:20px; max-width:600px; margin:10% auto; border-radius:5px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        <h2>Terms of Service & Privacy Policy</h2>
+        <div style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:15px; font-size:0.9em;">
+          <p><strong>Terms of Service:</strong> Use this community exchange at your own risk. Be respectful. Do not list illegal items.</p>
+          <p><strong>Privacy Policy:</strong> Your username is visible to other users. We do not collect personal data beyond what's needed for basic login functionality.</p>
+        </div>
+        <button id="acceptTermsBtn">I Agree</button>
       </div>
-      <button id="acceptTermsBtn">I Agree</button>
     </div>
-  </div>
-  <script src="shared.js"></script>
+  </main>
 
   <script>
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
