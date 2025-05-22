@@ -72,18 +72,19 @@ async function deleteListing(id) {
   }
 }
 
-// ✅ Login/logout UI
-const authLinks = document.getElementById('authLinks');
-const isLoggedIn = document.cookie.includes('token=');
-
-if (isLoggedIn) {
-  authLinks.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
-} else {
-  authLinks.innerHTML = `<a href="login.html">Login</a>`;
-}
+// ✅ Login/logout UI (moved to shared.js, remove local redeclaration if shared.js is present)
+// const authLinks = document.getElementById('authLinks');
+// const isLoggedIn = document.cookie.includes('token=');
+// if (authLinks) {
+//   authLinks.innerHTML = isLoggedIn
+//     ? `<a href="#" onclick="logout()">Logout</a>`
+//     : `<a href="login.html">Login</a>`;
+// }
 
 function logout() {
   document.cookie = "token=; Max-Age=0; path=/";
+  document.cookie = "username=; Max-Age=0; path=/";
+  document.cookie = "userid=; Max-Age=0; path=/";
   location.reload();
 }
 

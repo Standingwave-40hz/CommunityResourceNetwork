@@ -2,26 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel - Community Resource Network</title>
+  <title>ComShare</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .admin-section { margin-bottom: 30px; }
-    .admin-section h2 { margin-bottom: 10px; }
-    .admin-card { background: #fff; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
-    .admin-card button { margin: 5px 5px 0 0; background-color: #444; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-    #adminBanner { background: #e0ffe0; padding: 10px; border: 1px solid #00a000; font-weight: bold; color: #006600; margin-bottom: 20px; }
-  </style>
+  <script src="shared.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="index.html">Main Listings</a> |
-      <a href="toolshare.html">Tool Share</a> |
-      <a href="mylistings.html">My Listings</a> |
-      <a href="admin.html">Admin Panel</a> |
-      <span id="authLinks"></span>
-    </nav>
-  </header>
 
   <h1>Admin Panel</h1>
   <div id="adminBanner" style="display: none;">👑 You are logged in as admin.</div>
@@ -38,6 +24,7 @@
     <div id="listingList"></div>
     <button onclick="exportListings()">📤 Export Listings as CSV</button>
   </div>
+  <script src="shared.js"></script>
 
   <script>
     const authLinks = document.getElementById('authLinks');

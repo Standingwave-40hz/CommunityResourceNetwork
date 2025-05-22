@@ -7,7 +7,9 @@ const authenticateUser = require('../middleware/auth');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "defaultsecret";
 
+// ========================
 // Register
+// ========================
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -26,7 +28,9 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// ========================
 // Login
+// ========================
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -75,7 +79,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Accept Terms of Service
+// ========================
+// Accept Terms
+// ========================
 router.patch('/accept-terms', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -91,7 +97,9 @@ router.patch('/accept-terms', authenticateUser, async (req, res) => {
   }
 });
 
-// Update contact info
+// ========================
+// Update Contact Info
+// ========================
 router.patch('/contact', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -107,7 +115,9 @@ router.patch('/contact', authenticateUser, async (req, res) => {
   }
 });
 
-// Get current user info
+// ========================
+// Get Current User Info
+// ========================
 router.get('/me', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -123,8 +133,10 @@ router.get('/me', authenticateUser, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-const User = require('../models/User');
 
+// ========================
+// Update Password
+// ========================
 router.patch('/password', authenticateUser, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -145,4 +157,5 @@ router.patch('/password', authenticateUser, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 module.exports = router;

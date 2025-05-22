@@ -1,20 +1,13 @@
 // Check login and handle form visibility
-const isLoggedIn = document.cookie.includes('token=');
+const isLoggedIn = window.isLoggedIn ?? document.cookie.includes('token=');
 const toolForm = document.getElementById('toolForm');
 const loginMessage = document.getElementById('loginMessage');
-const authLinks = document.getElementById('authLinks');
 
 if (!isLoggedIn) {
   if (toolForm) toolForm.style.display = 'none';
   if (loginMessage) loginMessage.innerHTML = `
     <p><strong>You must <a href="login.html">log in</a> to post a tool.</strong></p>
   `;
-}
-
-if (authLinks) {
-  authLinks.innerHTML = isLoggedIn
-    ? `<a href="#" onclick="logout()">Logout</a>`
-    : `<a href="login.html">Login</a>`;
 }
 
 function getCurrentUsername() {
@@ -34,7 +27,20 @@ function logout() {
   location.reload();
 }
 
-// Submit new tool listing
+if (isLoggedIn) {
+  fetch('/api/auth/me')
+    .then(res => res.json())
+    .then(data => {
+      const banner = document.getElementById('welcomeBanner');
+      if (data.username && banner) {
+        banner.innerText = `Welcome, ${data.username}`;
+      }
+      if (document.getElementById('contact')) {
+        document.getElementById('contact').value = data.contact || '';
+      }
+    });
+}
+
 if (toolForm) {
   toolForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -58,7 +64,96 @@ if (toolForm) {
   });
 }
 
-// Load and render tools
+document.getElementById('searchMain')?.addEventListener('input', loadTools);
+
+async function viewHistory(toolId, ownerId) {
+  const res = await fetch(`/api/borrow/history/${toolId}`);
+  const history = await res.json();
+
+  const container = document.createElement('div');
+  container.style.padding = '10px';
+  container.style.borderTop = '1px solid #ccc';
+
+  const currentUserId = getCurrentUserId();
+
+  if (!Array.isArray(history) || history.length === 0) {
+    container.innerHTML = '<em>No borrow history.</em>';
+  } else {
+    history.forEach(record => {
+      const entry = document.createElement('div');
+      entry.innerHTML = `
+        <strong>${record.borrower}</strong> borrowed on ${new Date(record.borrowedAt).toLocaleString()}<br>
+        Returned: ${record.returnedAt ? new Date(record.returnedAt).toLocaleString() : 'Not yet'}<br>
+        Comment: <span>${record.comment || '<em>None</em>'}</span>
+      `;
+
+      if (isLoggedIn && currentUserId === ownerId && !record.comment) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Add comment';
+        input.style.marginTop = '5px';
+
+        const submitBtn = document.createElement('button');
+        submitBtn.textContent = 'Submit';
+        submitBtn.onclick = () => submitComment(record._id, input);
+
+        entry.appendChild(document.createElement('br'));
+        entry.appendChild(input);
+        entry.appendChild(submitBtn);
+      }
+
+      entry.appendChild(document.createElement('hr'));
+      container.appendChild(entry);
+    });
+  }
+
+  const button = document.getElementById(`history-${toolId}`);
+  button.insertAdjacentElement('afterend', container);
+  button.disabled = true;
+}
+
+async function ownerMarkBorrowed(toolId) {
+  const input = document.getElementById(`borrowerInput-${toolId}`);
+  const comment = input?.value.trim();
+  if (!comment) return alert("Please enter a borrower name.");
+
+  const res = await fetch(`/api/borrow/${toolId}/owner-mark-borrowed`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ comment })
+  });
+
+  if (res.ok) {
+    alert("Tool marked as borrowed.");
+    loadTools();
+  } else {
+    const data = await res.json();
+    alert(`Failed: ${data.message || "Unknown error"}`);
+  }
+}
+
+async function ownerReturnTool(toolId) {
+  const input = document.getElementById(`returnComment-${toolId}`);
+  const comment = input?.value.trim() || '';
+
+  const confirmed = confirm("Are you sure you want to mark this tool as returned?");
+  if (!confirmed) return;
+
+  const res = await fetch(`/api/borrow/${toolId}/owner-return`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ comment })
+  });
+
+  if (res.ok) {
+    alert("Tool marked as returned.");
+    loadTools();
+  } else {
+    const data = await res.json();
+    alert(`Failed to return: ${data.message || "Unknown error"}`);
+  }
+}
+
 async function loadTools() {
   const res = await fetch('/api/listings');
   let listings = [];
@@ -76,17 +171,27 @@ async function loadTools() {
   }
 
   const container = document.getElementById('toolListings');
-  const searchTerm = document.getElementById('search').value.toLowerCase();
+  if (!container) {
+    console.error("❌ Missing #toolListings element in HTML");
+    return;
+  }
+  const searchInput = document.getElementById('searchMain');
+  const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
   container.innerHTML = '';
 
   const currentUserId = getCurrentUserId();
 
   const filtered = listings.filter(l =>
-    l.category === 'Tool' &&
+    l.category?.toLowerCase() === 'tool' &&
     (l.title.toLowerCase().includes(searchTerm) || l.description.toLowerCase().includes(searchTerm))
   );
 
   filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p><em>No tools found matching your search.</em></p>';
+    return;
+  }
 
   filtered.forEach(tool => {
     let actionButton = '';
@@ -125,144 +230,10 @@ async function loadTools() {
   });
 }
 
-// Owner marks tool as borrowed
-async function ownerMarkBorrowed(toolId) {
-  const input = document.getElementById(`borrowerInput-${toolId}`);
-  const comment = input.value.trim();
-  if (!comment) return alert("Please enter a borrower name.");
-
-  const res = await fetch(`/api/borrow/${toolId}/owner-mark-borrowed`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ comment })
-  });
-
-  if (res.ok) {
-    alert("Tool marked as borrowed.");
-    loadTools();
-  } else {
-    const data = await res.json();
-    alert(`Failed: ${data.message || "Unknown error"}`);
-  }
-}
-
-// Owner marks tool as returned
-async function ownerReturnTool(toolId) {
-  const input = document.getElementById(`returnComment-${toolId}`);
-  const comment = input.value.trim();
-
-  const confirmed = confirm("Are you sure you want to mark this tool as returned?");
-  if (!confirmed) return;
-
-  const res = await fetch(`/api/borrow/${toolId}/owner-return`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ comment })
-  });
-
-  if (res.ok) {
-    alert("Tool marked as returned.");
-    loadTools();
-  } else {
-    const data = await res.json();
-    alert(`Failed to return: ${data.message || "Unknown error"}`);
-  }
-}
-
-// Return tool (for non-owners)
-async function returnTool(id) {
-  const confirmed = confirm("Are you sure you want to return this tool?");
-  if (!confirmed) return;
-
-  const res = await fetch(`/api/borrow/${id}/return`, { method: 'PATCH' });
-
-  if (res.ok) {
-    alert("Tool returned successfully!");
-    loadTools();
-  } else {
-    let message = "Unknown error";
-    try {
-      const data = await res.json();
-      message = data.message || JSON.stringify(data);
-    } catch {
-      message = "Failed to parse error message.";
-    }
-    alert(`Failed to return tool: ${message}`);
-  }
-}
-
-// Submit comment
-async function submitComment(borrowId, inputElement) {
-  const comment = inputElement.value.trim();
-  if (!comment) return alert("Comment cannot be empty.");
-
-  const res = await fetch(`/api/borrow/${borrowId}/comment`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ comment })
-  });
-
-  if (res.ok) {
-    alert('Comment saved.');
-    loadTools();
-  } else {
-    alert('Failed to save comment.');
-  }
-}
-
-// View borrow history
-async function viewHistory(toolId, ownerId) {
-  const res = await fetch(`/api/borrow/history/${toolId}`);
-  const history = await res.json();
-
-  const container = document.createElement('div');
-  container.style.padding = '10px';
-  container.style.borderTop = '1px solid #ccc';
-
-  const currentUserId = getCurrentUserId();
-
-  if (history.length === 0) {
-    container.innerHTML = '<em>No borrow history.</em>';
-  } else {
-    history.forEach(record => {
-      const entry = document.createElement('div');
-      entry.innerHTML = `
-        <strong>${record.borrower}</strong> borrowed on ${new Date(record.borrowedAt).toLocaleString()}<br>
-        Returned: ${record.returnedAt ? new Date(record.returnedAt).toLocaleString() : 'Not yet'}<br>
-        Comment: <span>${record.comment || '<em>None</em>'}</span>
-      `;
-
-      if (isLoggedIn && currentUserId === ownerId && !record.comment) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Add comment';
-        input.style.marginTop = '5px';
-
-        const submitBtn = document.createElement('button');
-        submitBtn.textContent = 'Submit';
-        submitBtn.onclick = () => submitComment(record._id, input);
-
-        entry.appendChild(document.createElement('br'));
-        entry.appendChild(input);
-        entry.appendChild(submitBtn);
-      }
-
-      entry.appendChild(document.createElement('hr'));
-      container.appendChild(entry);
-    });
-  }
-
-  const button = document.getElementById(`history-${toolId}`);
-  button.insertAdjacentElement('afterend', container);
-  button.disabled = true;
-}
-
-// Global hooks
+// Register globally
 window.ownerMarkBorrowed = ownerMarkBorrowed;
+window.loadTools = loadTools;
 window.ownerReturnTool = ownerReturnTool;
-window.submitComment = submitComment;
-window.returnTool = returnTool;
 window.viewHistory = viewHistory;
 
-document.getElementById('search').addEventListener('input', loadTools);
 loadTools();

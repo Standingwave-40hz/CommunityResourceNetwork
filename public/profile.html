@@ -2,27 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Profile - Community Resource Network</title>
+  <title>ComShare</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .profile-section { margin-bottom: 30px; }
-    label { display: block; margin-top: 10px; }
-    input { margin-bottom: 10px; width: 300px; padding: 6px; }
-    .history-card { background: #f9f9f9; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-  </style>
+  <script src="shared.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="index.html">Main Listings</a> |
-      <a href="toolshare.html">Tool Share</a> |
-      <a href="mylistings.html">My Listings</a> |
-      <a href="profile.html">Profile</a> |
-      <span id="adminLink"></span>
-      <span id="authLinks"></span>
-    </nav>
-    <div id="welcomeBanner"></div>
-  </header>
 
   <h1>My Profile</h1>
 
@@ -49,11 +34,9 @@
       </form>
     </div>
 
-    <div class="profile-section">
-      <h2>Borrow & Trade History</h2>
-      <div id="historyList">Loading history...</div>
-    </div>
+    
   </div>
+  <script src="shared.js"></script>
 
   <script>
     const authLinks = document.getElementById('authLinks');
@@ -68,12 +51,11 @@
     }
 
     async function loadProfile() {
-  let user = null;
-  try {
-    const res = await fetch('/api/auth/me');
-    if (!res.ok) throw new Error('Not authenticated');
-    user = await res.json();
-        const user = await res.json();
+      let user = null;
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) throw new Error('Not authenticated');
+        user = await res.json();
 
         document.getElementById("welcomeBanner").innerText = `Welcome, ${user.username}`;
         document.getElementById("contact").value = user.contact || '';
@@ -84,12 +66,13 @@
         }
 
         const historyRes = await fetch('/api/borrow/history/user');
-        const history = await historyRes.json();
-
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-
-        if (!Array.isArray(history)) throw new Error("History is not an array");
+/*const history = await historyRes.json();
+console.log("History response:", history);
+if (!Array.isArray(history)) {
+  console.error("Invalid history response:", history);
+  document.getElementById("historyList").innerText = "Unable to load your borrow history. Please try again later.";
+  return;
+}
 
         if (history.length === 0) {
           historyList.innerText = "No history available.";
@@ -106,7 +89,7 @@
             Comment: ${record.comment || '<em>None</em>'}
           `;
           historyList.appendChild(card);
-        });
+        });*/
 
       } catch (err) {
         console.error("Failed to load profile:", err);

@@ -58,16 +58,30 @@ document.getElementById('searchMain').addEventListener('input', loadMainListings
 document.getElementById('categoryFilter').addEventListener('change', loadMainListings);
 loadMainListings();
 
-const authLinks = document.getElementById('authLinks');
-const isLoggedIn = document.cookie.includes('token=');
+// Removed duplicate login/logout and authLinks logic – now handled by shared.js
+// const authLinks = document.getElementById('authLinks');
+// const isLoggedIn = document.cookie.includes('token=');
+// if (authLinks) {
+//   authLinks.innerHTML = isLoggedIn
+//     ? `<a href="#" onclick="logout()">Logout</a>`
+//     : `<a href="login.html">Login</a>`;
+// }
 
-if (authLinks) {
-  authLinks.innerHTML = isLoggedIn
-    ? `<a href="#" onclick="logout()">Logout</a>`
-    : `<a href="login.html">Login</a>`;
-}
+// function logout() {
+//   document.cookie = "token=; Max-Age=0; path=/";
+//   location.reload();
+// }
 
-function logout() {
-  document.cookie = "token=; Max-Age=0; path=/";
-  location.reload();
-}
+// if (isLoggedIn) {
+//   fetch('/api/auth/me')
+//     .then(res => res.json())
+//     .then(data => {
+//       const banner = document.getElementById('welcomeBanner');
+//       if (data.username && banner) {
+//         banner.innerText = `Welcome, ${data.username}`;
+//       }
+//       if (document.getElementById('contact')) {
+//         document.getElementById('contact').value = data.contact || '';
+//       }
+//     });
+// }

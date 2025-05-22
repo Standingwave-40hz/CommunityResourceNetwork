@@ -2,22 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Community Resource Network</title>
+  <title>ComShare</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="shared.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Community Resource Network</h1>
-
-  <header>
-    <nav>
-      <a href="index.html">Main Listings</a> |
-      <a href="toolshare.html">Tool Share</a> |
-      <a href="mylistings.html">My Listings</a> |
-      <a href="profile.html">Profile</a> |
-      <span id="authLinks"></span>
-    </nav>
-    <div id="welcomeBanner" style="margin-top: 10px; font-weight: bold;"></div>
-  </header>
+  
+  <!-- Shared header injected by shared.js -->
 
   <form id="listingForm">
     <input type="text" id="title" placeholder="Item Title" required />
@@ -65,35 +57,5 @@
       });
     }
   </script>
-
-  <script>
-    const authLinks = document.getElementById('authLinks');
-    const isLoggedIn = document.cookie.includes('token=');
-
-    if (isLoggedIn) {
-      authLinks.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
-
-      fetch('/api/auth/me')
-        .then(res => res.json())
-        .then(data => {
-          const banner = document.getElementById('welcomeBanner');
-          if (data.username) {
-            banner.innerText = `Welcome, ${data.username}`;
-            if (document.getElementById('contact')) {
-              document.getElementById('contact').value = data.contact || '';
-            }
-          }
-        });
-    } else {
-      authLinks.innerHTML = `<a href="login.html">Login</a>`;
-    }
-
-    function logout() {
-      document.cookie = "token=; Max-Age=0; path=/";
-      location.reload();
-    }
-  </script>
-
-  <script src="script.js"></script>
 </body>
 </html>

@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Tool Share | Community Resource Network</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>ComShare</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="shared.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Community Tool Share</h1>
-<header>
 
-    <nav>
-    <p id="loginMessage"></p>
-    <a href="index.html">Main Listings</a> |
-    <a href="toolshare.html">Tool Share</a> |
-    <a href="mylistings.html">My Listings</a> |
-    <span id="authLinks"></span>
-  </nav>
-</header>
-   <p id="loginMessage"></p>
+  <h1>Tool Share</h1>
 
-<form id="toolForm">
-  <input type="text" id="title" placeholder="Tool Name" required />
-  <input type="text" id="description" placeholder="Description" required />
-  <input type="text" id="contact" placeholder="Contact Info" required />
-  <button type="submit">Post Tool</button>
-</form>
+  <form id="toolForm">
+    <input type="text" id="title" placeholder="Tool Title" required />
+    <input type="text" id="description" placeholder="Description" required />
+    <input type="text" id="contact" placeholder="Contact Info" required />
+    <button type="submit">Add Tool</button>
+  </form>
 
-    <h2>Available Tools</h2>
-    <input type="text" id="search" placeholder="Search tools..." />
-    <div id="toolListings"></div>
+  <h2>Available Tools</h2>
+  <label for="categoryFilter"><strong>Filter by Category:</strong></label>
+  <select id="categoryFilter">
+    <option value="">All Categories</option>
+    <!-- categories will be injected here -->
+  </select>
 
-    <script src="toolscript.js"></script>
+  <input type="text" id="searchMain" placeholder="Search tools..." />
+  <div id="toolListings"></div>
+  <script src="shared.js"></script>
+
+  <script src="toolscript.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

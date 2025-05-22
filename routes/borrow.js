@@ -113,7 +113,6 @@ router.patch('/:toolId/owner-mark-borrowed', authenticateUser, async (req, res) 
       return res.status(403).json({ message: "Only the tool owner can mark this as borrowed." });
     }
 
-    // Prevent duplicate active borrow record
     const alreadyBorrowed = await Borrow.findOne({
       toolId: req.params.toolId,
       returnedAt: { $exists: false }
@@ -124,12 +123,12 @@ router.patch('/:toolId/owner-mark-borrowed', authenticateUser, async (req, res) 
     }
 
     const borrow = new Borrow({
-  toolId: req.params.toolId,
-  userId: req.user.id,
-  borrowerComment: comment,
-  borrowedAt: new Date(),
-  returnedAt: undefined // 👈 Ensure this field is not set
-});
+      toolId: req.params.toolId,
+      userId: req.user.id,
+      borrowerComment: comment,
+      borrowedAt: new Date(),
+      returnedAt: undefined
+    });
 
     await borrow.save();
     tool.available = false;
@@ -158,6 +157,29 @@ router.get('/history/:toolId', async (req, res) => {
     })));
   } catch (err) {
     console.error("Error fetching borrow history:", err);
+    res.status(500).json({ message: "Failed to fetch borrow history." });
+  }
+});
+
+// GET /api/borrow/history/user
+router.get('/history/user', authenticateUser, async (req, res) => {
+  try {
+    const records = await Borrow.find({ userId: req.user.id }).populate('toolId');
+
+    const formatted = records.map(record => {
+      const tool = record.toolId;
+      return {
+        title: tool?.title || 'Deleted Listing',
+        category: tool?.category || 'Unknown',
+        borrowedAt: record.borrowedAt,
+        returnedAt: record.returnedAt || null,
+        comment: record.comment || ''
+      };
+    });
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("Error fetching user history:", err);
     res.status(500).json({ message: "Failed to fetch borrow history." });
   }
 });
