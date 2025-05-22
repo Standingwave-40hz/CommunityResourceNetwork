@@ -1,13 +1,15 @@
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const authenticateUser = require('../middleware/auth');
 
-const JWT_SECRET = process.env.JWT_SECRET || "defaultsecret"; // Use env in prod
+const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || "defaultsecret";
 
 // Register
 router.post('/register', async (req, res) => {
+  try {
     const { username, password } = req.body;
 
     const existing = await User.findOne({ username });
@@ -18,10 +20,15 @@ router.post('/register', async (req, res) => {
     await newUser.save();
 
     res.status(201).json({ message: "User registered" });
+  } catch (err) {
+    console.error("Register error:", err);
+    res.status(500).json({ message: "Registration failed" });
+  }
 });
 
 // Login
 router.post('/login', async (req, res) => {
+  try {
     const { username, password } = req.body;
 
     const user = await User.findOne({ username });
@@ -31,41 +38,44 @@ router.post('/login', async (req, res) => {
     if (!match) return res.status(400).json({ message: "Incorrect password" });
 
     const token = jwt.sign(
-        { id: user._id, username: user.username },
-        JWT_SECRET,
-        { expiresIn: '2h' }
+      { id: user._id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '2h' }
     );
 
     // Set cookies
     res.cookie('token', token, {
-        httpOnly: false,
-        sameSite: 'Lax',
-        path: '/',
-        maxAge: 2 * 60 * 60 * 1000
+      httpOnly: false,
+      sameSite: 'Lax',
+      path: '/',
+      maxAge: 2 * 60 * 60 * 1000
     });
 
     res.cookie('username', encodeURIComponent(user.username), {
-        httpOnly: false,
-        sameSite: 'Lax',
-        path: '/',
-        maxAge: 2 * 60 * 60 * 1000
+      httpOnly: false,
+      sameSite: 'Lax',
+      path: '/',
+      maxAge: 2 * 60 * 60 * 1000
     });
 
-    res.cookie('userid', user._id.toString(), {   // ✅ Moved here
-        httpOnly: false,
-        sameSite: 'Lax',
-        path: '/',
-        maxAge: 2 * 60 * 60 * 1000
+    res.cookie('userid', user._id.toString(), {
+      httpOnly: false,
+      sameSite: 'Lax',
+      path: '/',
+      maxAge: 2 * 60 * 60 * 1000
     });
 
     res.json({
-  message: "Logged in",
-  requiresTerms: !user.acceptedTerms // true if they haven't accepted yet
+      message: "Logged in",
+      requiresTerms: !user.acceptedTerms
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Login failed" });
+  }
 });
 
-});
-const authenticateUser = require('../middleware/auth'); // if not already imported
-
+// Accept Terms of Service
 router.patch('/accept-terms', authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -81,4 +91,58 @@ router.patch('/accept-terms', authenticateUser, async (req, res) => {
   }
 });
 
+// Update contact info
+router.patch('/contact', authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.contact = req.body.contact;
+    await user.save();
+
+    res.json({ message: 'Contact info updated' });
+  } catch (err) {
+    console.error("Error updating contact:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get current user info
+router.get('/me', authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({
+      username: user.username,
+      isAdmin: user.isAdmin,
+      contact: user.contact || ''
+    });
+  } catch (err) {
+    console.error("GET /api/auth/me failed:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+const User = require('../models/User');
+
+router.patch('/password', authenticateUser, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) return res.status(401).json({ message: "Current password incorrect" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Password update error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 module.exports = router;

@@ -17,6 +17,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 const listingsRoute = require('./routes/listings');
 const authRoutes = require('./routes/auth');
 const borrowRoutes = require('./routes/borrow'); 
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
 app.use('/api/listings', listingsRoute);
 app.use('/api/auth', authRoutes);
 app.use('/api/borrow', borrowRoutes); 

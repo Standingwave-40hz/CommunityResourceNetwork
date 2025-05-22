@@ -1,39 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Community Resource Network</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Community Resource Network</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Community Resource Network</h1>
-     <header>
-        <nav>
-    <a href="index.html">Main Listings</a> |
-    <a href="toolshare.html">Tool Share</a> |
-    <a href="mylistings.html">My Listings</a> |
-    <span id="authLinks"></span>
-  </nav>
-</header>
-    <form id="listingForm">
-        <input type="text" id="title" placeholder="Item Title" required />
-        <input type="text" id="description" placeholder="Description" required />
-        <select id="category" required>
-            <option value="">Select Category</option>
-            <option value="Produce">Produce</option>
-            <option value="Meat/Eggs">Meat/Eggs</option>
-            <option value="Crafts">Crafts</option>
-            <option value="Prepared Foods">Prepared Foods</option>
-            <option value="Dried Goods">Dried Goods</option>
-        </select>
-        <input type="text" id="contact" placeholder="Contact Info" required />
-        <button type="submit">Post Listing</button>
-    </form>
+  <h1>Community Resource Network</h1>
 
-    <h2>Available Listings</h2>
-    <input type="text" id="searchMain" placeholder="Search listings..." />
-    <div id="mainListings"></div>
+  <header>
+    <nav>
+      <a href="index.html">Main Listings</a> |
+      <a href="toolshare.html">Tool Share</a> |
+      <a href="mylistings.html">My Listings</a> |
+      <a href="profile.html">Profile</a> |
+      <span id="authLinks"></span>
+    </nav>
+    <div id="welcomeBanner" style="margin-top: 10px; font-weight: bold;"></div>
+  </header>
 
-    <script src="script.js"></script>
+  <form id="listingForm">
+    <input type="text" id="title" placeholder="Item Title" required />
+    <input type="text" id="description" placeholder="Description" required />
+    <select id="category" required>
+      <option value="">Select Category</option>
+      <!-- categories will be injected here -->
+    </select>
+    <input type="text" id="contact" placeholder="Contact Info" required />
+    <button type="submit">Post Listing</button>
+  </form>
+
+  <h2>Available Listings</h2>
+  <label for="categoryFilter"><strong>Filter by Category:</strong></label>
+  <select id="categoryFilter">
+    <option value="">All Categories</option>
+    <!-- categories will be injected here -->
+  </select>
+
+  <input type="text" id="searchMain" placeholder="Search listings..." />
+  <div id="mainListings"></div>
+
+  <!-- Load categories from module -->
+  <script type="module">
+    import { CATEGORIES } from './categories.js';
+
+    const categorySelect = document.getElementById('category');
+    const filterSelect = document.getElementById('categoryFilter');
+
+    if (categorySelect) {
+      CATEGORIES.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    if (filterSelect) {
+      CATEGORIES.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        filterSelect.appendChild(option);
+      });
+    }
+  </script>
+
+  <script>
+    const authLinks = document.getElementById('authLinks');
+    const isLoggedIn = document.cookie.includes('token=');
+
+    if (isLoggedIn) {
+      authLinks.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
+
+      fetch('/api/auth/me')
+        .then(res => res.json())
+        .then(data => {
+          const banner = document.getElementById('welcomeBanner');
+          if (data.username) {
+            banner.innerText = `Welcome, ${data.username}`;
+            if (document.getElementById('contact')) {
+              document.getElementById('contact').value = data.contact || '';
+            }
+          }
+        });
+    } else {
+      authLinks.innerHTML = `<a href="login.html">Login</a>`;
+    }
+
+    function logout() {
+      document.cookie = "token=; Max-Age=0; path=/";
+      location.reload();
+    }
+  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>

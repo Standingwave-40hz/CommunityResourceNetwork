@@ -15,14 +15,18 @@ async function loadMyListings() {
   }
 
   const myListings = await myRes.json();
-  console.log("My listings response:", myListings);
+  const searchTerm = document.getElementById('searchMyListings')?.value.toLowerCase() || '';
+  const filtered = myListings.filter(item =>
+    item.title.toLowerCase().includes(searchTerm) ||
+    item.description.toLowerCase().includes(searchTerm)
+  );
 
-  if (myListings.length === 0) {
-    container.innerHTML = '<p>No listings posted yet.</p>';
+  if (filtered.length === 0) {
+    container.innerHTML = '<p>No matching listings found.</p>';
     return;
   }
 
-  myListings.forEach(item => {
+  filtered.forEach(item => {
     const card = document.createElement('div');
     card.className = 'tool-card';
     card.innerHTML = `
@@ -83,5 +87,5 @@ function logout() {
   location.reload();
 }
 
+document.getElementById('searchMyListings')?.addEventListener('input', loadMyListings);
 loadMyListings();
-

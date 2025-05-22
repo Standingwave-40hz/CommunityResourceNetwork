@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile - Community Resource Network</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .profile-section { margin-bottom: 30px; }
+    label { display: block; margin-top: 10px; }
+    input { margin-bottom: 10px; width: 300px; padding: 6px; }
+    .history-card { background: #f9f9f9; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Main Listings</a> |
+      <a href="toolshare.html">Tool Share</a> |
+      <a href="mylistings.html">My Listings</a> |
+      <a href="profile.html">Profile</a> |
+      <span id="adminLink"></span>
+      <span id="authLinks"></span>
+    </nav>
+    <div id="welcomeBanner"></div>
+  </header>
+
+  <h1>My Profile</h1>
+
+  <div id="profileContent">
+    <div class="profile-section">
+      <h2>Contact Information</h2>
+      <form id="contactForm">
+        <label for="contact">Preferred Contact Info:</label>
+        <input type="text" id="contact" name="contact" required />
+        <button type="submit">Save Contact Info</button>
+      </form>
+    </div>
+
+    <div class="profile-section">
+      <h2>Update Password</h2>
+      <form id="passwordForm">
+        <label for="currentPassword">Current Password:</label>
+        <input type="password" id="currentPassword" required />
+
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" required />
+
+        <button type="submit">Update Password</button>
+      </form>
+    </div>
+
+    <div class="profile-section">
+      <h2>Borrow & Trade History</h2>
+      <div id="historyList">Loading history...</div>
+    </div>
+  </div>
+
+  <script>
+    const authLinks = document.getElementById('authLinks');
+    const isLoggedIn = document.cookie.includes('token=');
+    if (authLinks) {
+      authLinks.innerHTML = isLoggedIn ? `<a href="#" onclick="logout()">Logout</a>` : `<a href="login.html">Login</a>`;
+    }
+
+    function logout() {
+      document.cookie = "token=; Max-Age=0; path=/";
+      location.reload();
+    }
+
+    async function loadProfile() {
+  let user = null;
+  try {
+    const res = await fetch('/api/auth/me');
+    if (!res.ok) throw new Error('Not authenticated');
+    user = await res.json();
+        const user = await res.json();
+
+        document.getElementById("welcomeBanner").innerText = `Welcome, ${user.username}`;
+        document.getElementById("contact").value = user.contact || '';
+
+        if (user.isAdmin) {
+          const adminLink = document.getElementById("adminLink");
+          adminLink.innerHTML = `<a href="admin.html">Admin Panel</a> | `;
+        }
+
+        const historyRes = await fetch('/api/borrow/history/user');
+        const history = await historyRes.json();
+
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+
+        if (!Array.isArray(history)) throw new Error("History is not an array");
+
+        if (history.length === 0) {
+          historyList.innerText = "No history available.";
+          return;
+        }
+
+        history.forEach(record => {
+          const card = document.createElement('div');
+          card.className = 'history-card';
+          card.innerHTML = `
+            <strong>${record.title}</strong> (${record.category})<br>
+            Borrowed: ${new Date(record.borrowedAt).toLocaleDateString()}<br>
+            Returned: ${record.returnedAt ? new Date(record.returnedAt).toLocaleDateString() : 'Not yet'}<br>
+            Comment: ${record.comment || '<em>None</em>'}
+          `;
+          historyList.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+        document.getElementById("welcomeBanner").innerText = "Welcome, guest";
+        document.getElementById('profileContent').innerHTML = '';
+      }
+    }
+
+    document.getElementById('contactForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const contact = document.getElementById('contact').value;
+
+      try {
+        const res = await fetch('/api/auth/contact', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact })
+        });
+
+        if (res.ok) {
+          alert('Contact info updated!');
+        } else {
+          throw new Error("Contact update failed");
+        }
+      } catch (err) {
+        console.error("Contact update error:", err);
+        alert("Failed to update contact info.");
+      }
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/password', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        if (res.ok) {
+          alert('Password updated successfully.');
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+        } else {
+          const data = await res.json();
+          throw new Error(data.message || "Password update failed");
+        }
+      } catch (err) {
+        console.error("Password update error:", err);
+        alert("Failed to update password: " + err.message);
+      }
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

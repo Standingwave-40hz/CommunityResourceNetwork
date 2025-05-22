@@ -18,8 +18,8 @@ router.get('/', async (req, res) => {
 
       return {
         ...listing.toObject(),
-        ownerId: listing.userId.toString(),              // used by frontend to check ownership
-        borrowerComment: borrow?.comment || null         // used to display "Marked by owner"
+        ownerId: listing.userId.toString(),
+        borrowerComment: borrow?.comment || null
       };
     }));
 
@@ -73,8 +73,25 @@ router.delete('/:id', authenticateUser, async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
+    // ✅ Check for active borrow record
+    const activeBorrow = await Borrow.findOne({
+      toolId: req.params.id,
+      returnedAt: { $exists: false }
+    });
+
+    if (activeBorrow) {
+      return res.status(400).json({
+        message: "This listing is currently borrowed and cannot be deleted until it is returned."
+      });
+    }
+
+    // ✅ Delete related borrow history
+    await Borrow.deleteMany({ toolId: req.params.id });
+
+    // ✅ Delete the listing itself
     await Listing.findByIdAndDelete(req.params.id);
-    res.json({ message: "Listing deleted" });
+
+    res.json({ message: "Listing and associated borrow history deleted" });
   } catch (err) {
     console.error("DELETE /api/listings/:id failed:", err);
     res.status(500).json({ message: err.message });
