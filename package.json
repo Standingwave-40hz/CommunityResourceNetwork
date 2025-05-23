@@ -1,14 +1,15 @@
 {
   "name": "communityresourcenetwork",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "CommShare - Community Resource Sharing Platform",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["community", "sharing", "tools", "express", "mongodb"],
+  "author": "Caley Kelly",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
