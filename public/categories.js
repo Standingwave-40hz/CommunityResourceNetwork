@@ -1,5 +1,3 @@
-// public/categories.js
-
 export const CATEGORIES = [
   "Produce",
   "Meat/Eggs",
