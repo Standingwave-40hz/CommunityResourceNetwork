@@ -6,14 +6,19 @@ CommShare is a lightweight, full-stack community resource exchange platform that
 
 ## 🚀 Deployment Instructions
 
-These steps assume you're using **MongoDB Atlas**, **Node.js**, and deploying to **Render** or **Heroku** (for backend) + **GitHub Pages/Vercel/Netlify** (for frontend).
+This project uses:
+
+- **MongoDB Atlas** for cloud-based document storage
+- **Node.js + Express** for backend RESTful API
+- **Heroku** for backend hosting
+- **GitHub Pages** (or Netlify/Vercel) for frontend hosting
 
 ---
 
 ## 🗂️ Project Structure
 
 ```
-ComShare/
+commshare/
 ├── models/
 │   ├── User.js
 │   ├── Listing.js
@@ -39,12 +44,14 @@ ComShare/
 ├── script.js
 ├── server.js
 ├── .env
+├── .gitignore
+├── Procfile
 └── README.md
 ```
 
 ---
 
-## 🔧 Setup Instructions
+## 🔧 Setup Instructions (Local)
 
 ### 1. Clone the repository
 
@@ -65,90 +72,94 @@ npm install
 touch .env
 ```
 
-Inside `.env`, add your MongoDB connection string and JWT secret:
+Inside `.env`, set the following:
 
 ```
-MONGO_URI=mongodb+srv://<username>:<password>@your-cluster.mongodb.net/communitydb?retryWrites=true&w=majority
-JWT_SECRET=yourSuperSecretKey
+MONGO_URI=your_mongodb_atlas_connection_uri
+JWT_SECRET=your_secure_jwt_secret_here
 ```
 
 ---
 
 ### 4. Create Initial Admin User
 
-Run the interactive setup script to add the first admin account:
+Run this script to securely create the first admin:
 
 ```bash
 node createAdmin.js
 ```
 
-The script will ask you to input:
+The script will prompt for:
 - Admin username
 - Password
-- Contact info (email or phone)
+- Contact info
 
-Make sure MongoDB is running and `.env` is configured before running this step.
+It will abort if an admin already exists.
 
 ---
 
-### 5. Start the server
+### 5. Start the development server
 
 ```bash
 node server.js
 ```
 
-App will run on: [http://localhost:3000](http://localhost:3000)
+App will be available at [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## ☁️ Deployment (Render / Heroku)
+## ☁️ Deployment on Heroku (Backend)
 
-1. Push to GitHub.
-2. Create a new **Web Service** on [Render](https://render.com) or [Heroku](https://heroku.com).
-3. Connect your GitHub repo.
-4. Add Environment Variables (same as `.env`).
-5. Set the Start Command:  
-   ```bash
-   node server.js
-   ```
+### 📦 One-Time Setup
 
----
+1. Push your code to GitHub
+2. Create an app on [Heroku](https://heroku.com)
+3. Under the **Deploy** tab:
+   - Connect your GitHub repo
+   - Enable automatic deploys (optional)
 
-## 🌐 Deploy Static Frontend
+### 🔐 Set environment variables under **Settings > Config Vars**:
 
-If using GitHub Pages / Vercel / Netlify:
-- Place your `/public` files in a separate branch/repo or build process
-- Point your domain to `/public/index.html`
+```
+MONGO_URI=your_mongodb_atlas_connection_uri
+JWT_SECRET=your_secure_jwt_secret_here
+```
 
----
+### ⚙️ Make sure you have:
 
-## 📬 Admin Features
+- A valid `Procfile` with:
+  ```
+  web: node server.js
+  ```
 
-- View, promote, disable/enable users
-- Delete listings
-- Create new users
-- Export listings/users as CSV
+- `package.json` with:
+  ```json
+  "scripts": {
+    "start": "node server.js"
+  }
+  ```
 
----
+### 🚀 Manual Deploy
 
-## 📌 Technologies Used
+Under **Deploy tab**:
+- Choose `main` branch
+- Click **Deploy Branch**
 
-- Node.js / Express.js
-- MongoDB Atlas
-- JWT + Cookies
-- HTML, CSS, Vanilla JS
-
----
-
-## 🛡️ Security Tips
-
-- Always use HTTPS in production
-- Change default passwords
-- Set proper JWT secret
-- Use CORS and cookie security settings if deploying across domains
+Visit your live backend URL:
+```
+https://your-app-name.herokuapp.com
+```
 
 ---
 
-## 🙋 Support
+## 🌐 Frontend Deployment (GitHub Pages)
 
-Built by [Caley Kelly](mailto:caleywekelly@gmail.com)  
+### Option A – GitHub Pages (Static Hosting)
+
+1. Move your `/public/` contents to a new GitHub repo
+2. In that repo:
+   - Go to **Settings > Pages**
+   - Select the `main` branch and `/ (root)`
+3. Update your frontend JS to point to the Heroku backend:
+   ```js
+   const
